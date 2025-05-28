@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="UOC20242" Database="" Version="10000">
+  <Project Name="UOC20242" Path="UOC20242.project" Active="Yes"/>
+  <Project Name="UOCPlay" Path="UOCPlay/UOCPlay.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug">
+      <Environment/>
+      <Project Name="UOC20242" ConfigName="Debug"/>
+      <Project Name="UOCPlay" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release">
+      <Environment/>
+      <Project Name="UOC20242" ConfigName="Release"/>
+      <Project Name="UOCPlay" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
