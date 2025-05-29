@@ -156,6 +156,8 @@ static int compareByDateThenName(const tFilm *a, const tFilm *b);
 
 void swapFilmPointers(tFilmListNode **prev, tFilmList *list);
 
+void swapFreeFilmPointers(tFreeFilmListNode **prev, tFreeFilmList *list);
+
 ////////////////////////////////////////////
 
 #endif

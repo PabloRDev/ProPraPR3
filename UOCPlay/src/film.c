@@ -315,6 +315,34 @@ tApiError filmList_SortByYear_Bubble(tFilmList *list) {
 
 // 1d - Sort a list of free films by year
 tApiError freeFilmList_SortByYear_Bubble(tFreeFilmList *list) {
+    if (list == NULL)
+        return E_MEMORY_ERROR;
+    if (list->count < 2)
+        return E_SUCCESS;
+
+    bool swapped;
+    tFreeFilmListNode node;
+    node.next = list->first;
+
+    do {
+        swapped = false;
+        tFreeFilmListNode *prev = &node;
+
+        while (prev->next != NULL && prev->next->next != NULL) {
+            tFreeFilmListNode *a = prev->next;
+            tFreeFilmListNode *b = a->next;
+
+            if (compareByDateThenName(a->elem, b->elem) > 0) {
+                swapFreeFilmPointers(&prev->next, list);
+                swapped = true;
+            } else {
+                prev = prev->next;
+            }
+        }
+
+        list->first = node.next;
+    } while (swapped);
+
     return E_SUCCESS;
 }
 
@@ -336,11 +364,8 @@ tApiError filmCatalog_SortByYear(tFilmCatalog *catalog) {
     return E_SUCCESS;
 }
 
-// Return a pointer to the longest film of the catalog
+// 1f - Return a pointer to the longest film of the catalog
 tFilm *filmCatalog_OldestFind(tFilmCatalog catalog, bool free) {
-    /////////////////////////////////
-    // PR3_1f
-    /////////////////////////////////
 
     return NULL;
 }
@@ -610,8 +635,27 @@ static int compareByDateThenName(const tFilm *a, const tFilm *b) {
 }
 
 void swapFilmPointers(tFilmListNode **prev, tFilmList *list) {
+    // Preconditions
+    if (prev == NULL || *prev == NULL || (*prev)->next == NULL)
+        return;
+
     tFilmListNode *a = *prev;
     tFilmListNode *b = a->next;
+
+    a->next = b->next;
+    b->next = a;
+    *prev = b;
+
+    if (a->next == NULL)
+        list->last = a;
+}
+
+void swapFreeFilmPointers(tFreeFilmListNode **prev, tFreeFilmList *list) {
+    if (prev == NULL || *prev == NULL || (*prev)->next == NULL)
+        return;
+
+    tFreeFilmListNode *a = *prev;
+    tFreeFilmListNode *b = a->next;
 
     a->next = b->next;
     b->next = a;
