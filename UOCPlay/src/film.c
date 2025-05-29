@@ -397,13 +397,16 @@ tFilm *filmCatalog_OldestFind(tFilmCatalog catalog, bool free) {
     return oldest;
 }
 
-// Sort a catalog of films by rating, higher to lower
+// 1g - Sort a catalog of films by rating, higher to lower
 tApiError filmCatalog_SortByRating(tFilmCatalog *catalog) {
-    /////////////////////////////////
-    // PR3_1g
-    /////////////////////////////////
+    if (catalog == NULL) return E_MEMORY_ERROR;
 
-    return E_NOT_IMPLEMENTED;
+    sortFilmListByRating(&catalog->filmList);
+    sortFreeFilmListByRating(&catalog->freeFilmList);
+
+    catalog->sortedByDate = false;
+
+    return E_SUCCESS;
 }
 
 // Remove the films from the list
@@ -657,6 +660,25 @@ static int compareByDateThenName(const tFilm *a, const tFilm *b) {
     return strcmp(a->name, b->name);
 }
 
+static int compareByRatingThenName(const tFilm *a, const tFilm *b) {
+    if (a->rating > b->rating) return -1;
+    if (a->rating < b->rating) return 1;
+
+    return strcmp(a->name, b->name);
+}
+
+static void swapFilms(tFilm *a, tFilm *b) {
+    tFilm temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+static void swapFreeFilms(tFilm **a, tFilm **b) {
+    tFilm *temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 void swapFilmPointers(tFilmListNode **prev, tFilmList *list) {
     // Preconditions
     if (prev == NULL || *prev == NULL || (*prev)->next == NULL)
@@ -686,4 +708,40 @@ void swapFreeFilmPointers(tFreeFilmListNode **prev, tFreeFilmList *list) {
 
     if (a->next == NULL)
         list->last = a;
+}
+
+static void sortFilmListByRating(tFilmList *list) {
+    if (list == NULL || list->first == NULL) return;
+
+    tFilmListNode *i, *j, *min;
+
+    for (i = list->first; i != NULL; i = i->next) {
+        min = i;
+        for (j = i->next; j != NULL; j = j->next) {
+            if (compareByRatingThenName(&j->elem, &min->elem) < 0) {
+                min = j;
+            }
+        }
+        if (min != i) {
+            swapFilms(&i->elem, &min->elem);
+        }
+    }
+}
+
+static void sortFreeFilmListByRating(tFreeFilmList *list) {
+    if (list == NULL || list->first == NULL) return;
+
+    tFreeFilmListNode *i, *j, *min;
+
+    for (i = list->first; i != NULL; i = i->next) {
+        min = i;
+        for (j = i->next; j != NULL; j = j->next) {
+            if (compareByRatingThenName(j->elem, min->elem) < 0) {
+                min = j;
+            }
+        }
+        if (min != i) {
+            swapFreeFilms(&i->elem, &min->elem);
+        }
+    }
 }

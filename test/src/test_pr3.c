@@ -638,7 +638,7 @@ bool run_pr3_ex1(tTestSection *test_section, const char* input) {
             failed = true;
             passed = false;
             fail_all = true;
-        } else if (strcmp(catalog.freeFilmList.first->next->elem->name, film4.name)!=0) {
+        } else if (strcmp(catalog.freeFilmList.first->next->elem->name, film2.name) != 0) {
             failed = true;
             passed = false;
             fail_all = true;

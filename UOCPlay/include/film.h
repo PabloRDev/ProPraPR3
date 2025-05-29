@@ -154,9 +154,19 @@ tApiError film_catalog_free(tFilmCatalog *catalog);
 // HELPER FUNTIONS
 static int compareByDateThenName(const tFilm *a, const tFilm *b);
 
+static int compareByRatingThenName(const tFilm *a, const tFilm *b);
+
+static void swapFilms(tFilm *a, tFilm *b);
+
+static void swapFreeFilms(tFilm **a, tFilm **b);
+
 void swapFilmPointers(tFilmListNode **prev, tFilmList *list);
 
 void swapFreeFilmPointers(tFreeFilmListNode **prev, tFreeFilmList *list);
+
+static void sortFilmListByRating(tFilmList *list);
+
+static void sortFreeFilmListByRating(tFreeFilmList *list);
 
 ////////////////////////////////////////////
 
