@@ -151,6 +151,11 @@ int film_catalog_freeLen(tFilmCatalog catalog);
 // Remove the films from the catalog
 tApiError film_catalog_free(tFilmCatalog *catalog);
 
+// HELPER FUNTIONS
+static int compareByYearThenName(const tFilm *a, const tFilm *b);
+
+static void swapFilmsPointers(tFilm *a, tFilm *b);
+
 ////////////////////////////////////////////
 
 #endif

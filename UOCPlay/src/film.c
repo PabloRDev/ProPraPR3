@@ -279,22 +279,68 @@ tFilm *freeFilmList_longestFind(tFreeFilmList list) {
     return longest;
 }
 
-// Sort a list of films by year
+// 1c - Sort a list of films by year
 tApiError filmList_SortByYear_Bubble(tFilmList *list) {
-    /////////////////////////////////
-    // PR3_1c
-    /////////////////////////////////
+    if (list == NULL) {
+        return E_MEMORY_ERROR;
+    }
+    if (list->first == NULL) {
+        // Empty list -> sorted
+        return E_SUCCESS;
+    }
 
-    return E_NOT_IMPLEMENTED;
+    bool swapped;
+    tFilmListNode *node;
+
+    do {
+        swapped = false;
+        node = list->first;
+
+        while (node != NULL && node->next != NULL) {
+            // Next EXISTS
+            if (compareByYearThenName(&node->elem, &node->next->elem) > 0) {
+                // Not same year, next node name is before -> swap
+                swapFilmsPointers(&node->elem, &node->next->elem);
+                swapped = true;
+            }
+
+            node = node->next;
+        }
+    } while (swapped);
+
+    return E_SUCCESS;
 }
 
-// Sort a list of free films by year
+// 1d - Sort a list of free films by year
 tApiError freeFilmList_SortByYear_Bubble(tFreeFilmList *list) {
-    /////////////////////////////////
-    // PR3_1d
-    /////////////////////////////////
+    if (list == NULL) {
+        return E_MEMORY_ERROR;
+    }
+    if (list->first == NULL) {
+        // Empty list -> sorted
+        return E_SUCCESS;
+    }
 
-    return E_NOT_IMPLEMENTED;
+    bool swapped;
+    tFreeFilmListNode *node;
+
+    do {
+        swapped = false;
+        node = list->first;
+
+        while (node != NULL && node->next != NULL) {
+            // Next EXISTS
+            if (compareByYearThenName(node->elem, node->next->elem) > 0) {
+                // Not same year, next node name is before -> swap
+                swapFilmsPointers(node->elem, node->next->elem);
+                swapped = true;
+            }
+
+            node = node->next;
+        }
+    } while (swapped);
+
+    return E_SUCCESS;
 }
 
 // Sort a catalog of films by date
@@ -563,4 +609,18 @@ tApiError film_catalog_free(tFilmCatalog *catalog) {
     return E_SUCCESS;
     /////////////////////////////////
     // return E_NOT_IMPLEMENTED;
+}
+
+// HELPER FUNCTIONS
+static int compareByYearThenName(const tFilm *a, const tFilm *b) {
+    if (a->release.year != b->release.year) {
+        return a->release.year - b->release.year;
+    }
+    return strcmp(a->name, b->name);
+}
+
+static void swapFilmsPointers(tFilm *a, tFilm *b) {
+    tFilm temp = *a;
+    *a = *b;
+    *b = temp;
 }
