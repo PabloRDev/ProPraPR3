@@ -253,13 +253,30 @@ tFilm *filmList_longestFind(tFilmList list) {
     return longest;
 }
 
-// Return a pointer to the longest film of the list
+// 1b - Return a pointer to the longest film of the list
 tFilm *freeFilmList_longestFind(tFreeFilmList list) {
-    /////////////////////////////////
-    // PR3_1b
-    /////////////////////////////////
+    if (list.first == NULL) return NULL; // List empty
 
-    return NULL;
+    tFilm *longest = list.first->elem;
+    int maxLength = longest->duration.hour * 60 + longest->duration.minutes;
+
+    tFreeFilmListNode *node = list.first->next;
+
+    while (node != NULL) {
+        // While there is next
+        int currentLength = node->elem->duration.hour * 60 + node->elem->duration.minutes;
+
+        if (currentLength > maxLength) {
+            longest = node->elem;
+            maxLength = currentLength;
+        } else if (currentLength == maxLength && strcmp(node->elem->name, longest->name) < 0) {
+            longest = node->elem;
+        }
+
+        node = node->next;
+    }
+
+    return longest;
 }
 
 // Sort a list of films by year
