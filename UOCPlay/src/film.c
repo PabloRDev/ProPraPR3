@@ -281,31 +281,33 @@ tFilm *freeFilmList_longestFind(tFreeFilmList list) {
 
 // 1c - Sort a list of films by year
 tApiError filmList_SortByYear_Bubble(tFilmList *list) {
-    if (list == NULL) {
+    if (list == NULL)
         return E_MEMORY_ERROR;
-    }
-    if (list->first == NULL) {
-        // Empty list -> sorted
+    if (list->count < 2)
+        // Fewer than 2 elements -> already sorted
         return E_SUCCESS;
-    }
 
     bool swapped;
-    tFilmListNode *node;
+    tFilmListNode node;
+    node.next = list->first; // Dummy to list head
 
     do {
-        swapped = false;
-        node = list->first;
+        swapped = false; // If stays false, sorted already
+        tFilmListNode *prev = &node;
 
-        while (node != NULL && node->next != NULL) {
-            // Next EXISTS
-            if (compareByYearThenName(&node->elem, &node->next->elem) > 0) {
-                // Not same year, next node name is before -> swap
-                swapFilmsPointers(&node->elem, &node->next->elem);
+        while (prev->next != NULL && prev->next->next != NULL) {
+            tFilmListNode *current = prev->next;
+            tFilmListNode *next = current->next;
+
+            if (compareByDateThenName(&current->elem, &next->elem) > 0) {
+                swapFilmPointers(&prev->next, list);
                 swapped = true;
+            } else {
+                prev = prev->next;
             }
-
-            node = node->next;
         }
+
+        list->first = node.next;
     } while (swapped);
 
     return E_SUCCESS;
@@ -313,43 +315,25 @@ tApiError filmList_SortByYear_Bubble(tFilmList *list) {
 
 // 1d - Sort a list of free films by year
 tApiError freeFilmList_SortByYear_Bubble(tFreeFilmList *list) {
-    if (list == NULL) {
-        return E_MEMORY_ERROR;
-    }
-    if (list->first == NULL) {
-        // Empty list -> sorted
-        return E_SUCCESS;
-    }
-
-    bool swapped;
-    tFreeFilmListNode *node;
-
-    do {
-        swapped = false;
-        node = list->first;
-
-        while (node != NULL && node->next != NULL) {
-            // Next EXISTS
-            if (compareByYearThenName(node->elem, node->next->elem) > 0) {
-                // Not same year, next node name is before -> swap
-                swapFilmsPointers(node->elem, node->next->elem);
-                swapped = true;
-            }
-
-            node = node->next;
-        }
-    } while (swapped);
-
     return E_SUCCESS;
 }
 
-// Sort a catalog of films by date
+// 1e - Sort a catalog of films by date
 tApiError filmCatalog_SortByYear(tFilmCatalog *catalog) {
-    /////////////////////////////////
-    // PR3_1e
-    /////////////////////////////////
+    if (catalog == NULL) return E_MEMORY_ERROR;
+    if (catalog->filmList.first == NULL && catalog->freeFilmList.first == NULL) {
+        return E_SUCCESS;
+    }
 
-    return E_NOT_IMPLEMENTED;
+    tApiError err = filmList_SortByYear_Bubble(&catalog->filmList);
+    if (err != E_SUCCESS) return err;
+
+    err = freeFilmList_SortByYear_Bubble(&catalog->freeFilmList);
+    if (err != E_SUCCESS) return err;
+
+    catalog->sortedByDate = true;
+
+    return E_SUCCESS;
 }
 
 // Return a pointer to the longest film of the catalog
@@ -612,15 +596,27 @@ tApiError film_catalog_free(tFilmCatalog *catalog) {
 }
 
 // HELPER FUNCTIONS
-static int compareByYearThenName(const tFilm *a, const tFilm *b) {
-    if (a->release.year != b->release.year) {
+static int compareByDateThenName(const tFilm *a, const tFilm *b) {
+    if (a->release.year != b->release.year)
         return a->release.year - b->release.year;
-    }
+
+    if (a->release.month != b->release.month)
+        return a->release.month - b->release.month;
+
+    if (a->release.day != b->release.day)
+        return a->release.day - b->release.day;
+
     return strcmp(a->name, b->name);
 }
 
-static void swapFilmsPointers(tFilm *a, tFilm *b) {
-    tFilm temp = *a;
-    *a = *b;
-    *b = temp;
+void swapFilmPointers(tFilmListNode **prev, tFilmList *list) {
+    tFilmListNode *a = *prev;
+    tFilmListNode *b = a->next;
+
+    a->next = b->next;
+    b->next = a;
+    *prev = b;
+
+    if (a->next == NULL)
+        list->last = a;
 }
