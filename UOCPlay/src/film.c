@@ -349,25 +349,52 @@ tApiError freeFilmList_SortByYear_Bubble(tFreeFilmList *list) {
 // 1e - Sort a catalog of films by date
 tApiError filmCatalog_SortByYear(tFilmCatalog *catalog) {
     if (catalog == NULL) return E_MEMORY_ERROR;
+
+    // Both lists are empty -> sorted
     if (catalog->filmList.first == NULL && catalog->freeFilmList.first == NULL) {
+        catalog->sortedByDate = true;
         return E_SUCCESS;
     }
 
-    tApiError err = filmList_SortByYear_Bubble(&catalog->filmList);
-    if (err != E_SUCCESS) return err;
+    tApiError error = filmList_SortByYear_Bubble(&catalog->filmList);
+    if (error != E_SUCCESS) return error;
+    error = freeFilmList_SortByYear_Bubble(&catalog->freeFilmList);
+    if (error != E_SUCCESS) return error;
 
-    err = freeFilmList_SortByYear_Bubble(&catalog->freeFilmList);
-    if (err != E_SUCCESS) return err;
-
+    // Mark catalog as sorted
     catalog->sortedByDate = true;
 
     return E_SUCCESS;
 }
 
-// 1f - Return a pointer to the longest film of the catalog
+// 1f - Return a pointer to the oldest film of the catalog
 tFilm *filmCatalog_OldestFind(tFilmCatalog catalog, bool free) {
+    if (catalog.filmList.first == NULL && catalog.freeFilmList.first == NULL) {
+        // Both lists empty
+        return NULL;
+    }
 
-    return NULL;
+    tFilm *oldest = NULL;
+
+    if (free) {
+        tFreeFilmListNode *node = catalog.freeFilmList.first;
+        while (node != NULL) {
+            if (oldest == NULL || compareByDateThenName(node->elem, oldest) < 0) {
+                oldest = node->elem;
+            }
+            node = node->next;
+        }
+    } else {
+        tFilmListNode *node = catalog.filmList.first;
+        while (node != NULL) {
+            if (oldest == NULL || compareByDateThenName(&node->elem, oldest) < 0) {
+                oldest = &node->elem;
+            }
+            node = node->next;
+        }
+    }
+
+    return oldest;
 }
 
 // Sort a catalog of films by rating, higher to lower
@@ -378,7 +405,6 @@ tApiError filmCatalog_SortByRating(tFilmCatalog *catalog) {
 
     return E_NOT_IMPLEMENTED;
 }
-
 
 // Remove the films from the list
 tApiError filmList_free(tFilmList *list) {
@@ -557,13 +583,10 @@ tApiError film_catalog_add(tFilmCatalog *catalog, tFilm film) {
         }
     }
 
-    /////////////////////////////////
-    // PR3_1e
-    /////////////////////////////////
+    if (error == E_SUCCESS)
+        catalog->sortedByDate = false;
 
     return error;
-    /////////////////////////////////
-    // return E_NOT_IMPLEMENTED;
 }
 
 // Remove a film from the catalog
