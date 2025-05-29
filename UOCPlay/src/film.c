@@ -227,13 +227,30 @@ tFilm *filmList_find(tFilmList list, const char *name) {
     return NULL;
 }
 
-// Return a pointer to the longest film of the list
+// 1a - Return a pointer to the longest film of the list
 tFilm *filmList_longestFind(tFilmList list) {
-    /////////////////////////////////
-    // PR3_1a
-    /////////////////////////////////
+    if (list.first == NULL) return NULL; // List empty
 
-    return NULL;
+    tFilm *longest = &list.first->elem;
+    int maxLength = longest->duration.hour * 60 + longest->duration.minutes;
+
+    tFilmListNode *node = list.first->next;
+
+    while (node != NULL) {
+        // While there is next
+        int currentLength = node->elem.duration.hour * 60 + node->elem.duration.minutes;
+
+        if (currentLength > maxLength) {
+            longest = &node->elem;
+            maxLength = currentLength;
+        } else if (currentLength == maxLength && strcmp(node->elem.name, longest->name) < 0) {
+            longest = &node->elem;
+        }
+
+        node = node->next;
+    }
+
+    return longest;
 }
 
 // Return a pointer to the longest film of the list
