@@ -288,11 +288,12 @@ tApiError people_sortByVipLevel_QickSort(tPeople *data) {
 
 // 2f - Sort people by Document from lower to higher
 tApiError people_sortByDocument_QickSort(tPeople *data) {
-    /////////////////////////////////
-    // PR3_2f
-    /////////////////////////////////
+    assert(data != NULL);
+    if (data->count < 1) return E_SUCCESS;
 
-    return E_NOT_IMPLEMENTED;
+    quickSort(data->elems, 0, data->count - 1, comparePersonsByDocument);
+
+    return E_SUCCESS;
 }
 
 // Return the position of a person with provided document. -1 if it does not exist
