@@ -444,12 +444,13 @@ tSubscriptions *subscriptions_findByDocument(tSubscriptions data, char *document
     return result;
 }
 
-// return a pointer to the subscription with the specified id
+// 3c - Return a pointer to the subscription with the specified id
 tSubscription *subscriptions_findHash(tSubscriptions data, int id) {
-    /////////////////////////////////
-    // PR3_3c
-    /////////////////////////////////
-    return NULL;
+    if (id < 1 || id > data.count) {
+        return NULL;
+    }
+
+    return &data.elems[id - 1];
 }
 
 // Compare two subscription
