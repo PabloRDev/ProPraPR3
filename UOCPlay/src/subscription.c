@@ -277,13 +277,78 @@ tApiError update_vipLevel(tSubscriptions *data, tPeople *people) {
     return E_SUCCESS;
 }
 
-// Return a pointer to the longest film of the list
-char *popularFilm_find(tSubscriptions data) {
-    /////////////////////////////////
-    // PR3_3a
-    /////////////////////////////////
+// 3a - Return a pointer to the longest film of the list
 
-    return NULL;
+// Summary:
+// Scan all subscriptions and their film watchlist.
+// Keep track of unique films and count how many times each appears.
+// Update film info if it finds a newer release date for the same film.
+// Then it finds the film with the highest count, breaking ties by choosing the newest film.
+// Returns a dynamically allocated copy of the name of that film.
+// Returns NULL if no films are found.
+char *popularFilm_find(tSubscriptions data) {
+    if (data.count == 0) return NULL;
+
+    // Temporary storage (randomly set to 10 elems)
+    tFilm uniqueFilms[10];
+    int filmCounts[10];
+    int uniqueCount = 0;
+
+    // Subscriptions iteration to get the film stack
+    for (int i = 0; i < data.count; i++) {
+        const tFilmstack *stack = &data.elems[i].watchlist;
+        tFilmstackNode *node = stack->top;
+
+        // Film stack iteration
+        while (node != NULL) {
+            const tFilm current = node->elem;
+            int found = 0; // Flag -> already counted
+
+            // Check if the film already exists in uniqueFilms
+            for (int j = 0; j < uniqueCount; j++) {
+                if (film_equals(uniqueFilms[j], current)) {
+                    filmCounts[j]++;
+                    found = 1;
+
+                    // Check if the current film's release date is newer than the stored one
+                    if (date_cmp(current.release, uniqueFilms[j].release) > 0) {
+                        // Update to keep the newest release info
+                        uniqueFilms[j] = current;
+                    }
+
+                    break; // Film handled
+                }
+            }
+
+            // Not found in uniqueFilms -> add it to uniqueFilms
+            if (!found) {
+                uniqueFilms[uniqueCount] = current;
+                filmCounts[uniqueCount] = 1;
+                uniqueCount++;
+            }
+
+            node = node->next;
+        }
+    }
+
+    // After reviewing watchlist, no films
+    if (uniqueCount == 0) return NULL;
+
+    // Find most popular film -> If a .If two films have the same count, compare their release dates.The film with the newer release date wins the tie and becomes maxIndex.
+    int maxIndex = 0;
+    for (int i = 1; i < uniqueCount; i++) {
+        if (filmCounts[i] > filmCounts[maxIndex]) {
+            // A film has a higher count, it becomes the new maxIndex
+            maxIndex = i;
+        } else if (filmCounts[i] == filmCounts[maxIndex]) {
+            // Same count -> compare release dates -> newer release date wins
+            if (date_cmp(uniqueFilms[i].release, uniqueFilms[maxIndex].release) > 0) {
+                maxIndex = i;
+            }
+        }
+    }
+
+    return strdup(uniqueFilms[maxIndex].name);
 }
 
 // 3b 3d - Return a pointer to the subscriptions of the client with the specified document
