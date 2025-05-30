@@ -261,13 +261,20 @@ int calculate_vipLevel(tSubscriptions *data, char *document) {
     return (int) (totalPrice / 500.0);
 }
 
-// Update the vipLevel of each person 
+// 2d - Update the vipLevel of each person
 tApiError update_vipLevel(tSubscriptions *data, tPeople *people) {
-    /////////////////////////////////
-    // PR3_2d
-    /////////////////////////////////
+    assert(data != NULL);
+    assert(people != NULL);
 
-    return E_NOT_IMPLEMENTED;
+    for (int i = 0; i < people->count; i++) {
+        if (data->count == 0) {
+            people->elems[i].vipLevel = 0;
+        }
+
+        people->elems[i].vipLevel = calculate_vipLevel(data, people->elems[i].document);
+    }
+
+    return E_SUCCESS;
 }
 
 // Return a pointer to the longest film of the list
