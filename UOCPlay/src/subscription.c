@@ -353,7 +353,95 @@ char *popularFilm_find(tSubscriptions data) {
 
 // 3b 3d - Return a pointer to the subscriptions of the client with the specified document
 tSubscriptions *subscriptions_findByDocument(tSubscriptions data, char *document) {
-    return NULL;
+    if (document == NULL) return NULL;
+
+    // Allocate memory result
+    tSubscriptions *result = malloc(sizeof(tSubscriptions));
+    if (result == NULL) return NULL;
+
+    result->elems = NULL;
+    result->count = 0;
+
+    // No subscriptions -> empty result
+    if (data.count == 0) return result;
+
+    result->elems = malloc(sizeof(tSubscription) * data.count);
+    if (result->elems == NULL) {
+        free(result);
+        return NULL;
+    }
+
+    // Subscriptions iteration
+    for (int i = 0; i < data.count; i++) {
+        if (strcmp(data.elems[i].document, document) == 0) {
+            tSubscription *src = &data.elems[i];
+            tSubscription *dest = &result->elems[result->count];
+
+            // Deep copy
+            dest->id = result->count; // <-- Changed this line only
+            strcpy(dest->document, src->document);
+            dest->start_date = src->start_date;
+            dest->end_date = src->end_date;
+            strcpy(dest->plan, src->plan);
+            dest->price = src->price;
+            dest->numDevices = src->numDevices;
+
+            dest->watchlist.top = NULL;
+            dest->watchlist.count = 0;
+
+            tFilmstackNode *temp[1000]; // Assuming randomly 1000 films
+            int stackSize = 0;
+
+            // Iterate over the original watchlist stack
+            tFilmstackNode *node = src->watchlist.top;
+            while (node != NULL && stackSize < 1000) {
+                temp[stackSize++] = node;
+                node = node->next;
+            }
+
+            // Copy the stack nodes in reverse order to preserve original order
+            for (int j = stackSize - 1; j >= 0; j--) {
+                tFilmstackNode *newNode = malloc(sizeof(tFilmstackNode));
+                if (newNode == NULL) {
+                    break;
+                }
+
+                if (temp[j]->elem.name != NULL) {
+                    newNode->elem.name = malloc(strlen(temp[j]->elem.name) + 1);
+                    if (newNode->elem.name != NULL) {
+                        strcpy(newNode->elem.name, temp[j]->elem.name);
+                    } else {
+                        // malloc failure: set name to NULL
+                        newNode->elem.name = NULL;
+                    }
+                } else {
+                    newNode->elem.name = NULL;
+                }
+
+                newNode->elem.duration = temp[j]->elem.duration;
+                newNode->elem.genre = temp[j]->elem.genre;
+                newNode->elem.release = temp[j]->elem.release;
+                newNode->elem.rating = temp[j]->elem.rating;
+                newNode->elem.isFree = temp[j]->elem.isFree;
+
+                // Insert the new node at the top
+                newNode->next = dest->watchlist.top;
+                dest->watchlist.top = newNode;
+
+                dest->watchlist.count++;
+            }
+
+            result->count++;
+        }
+    }
+
+    // No matching subscriptions found
+    if (result->count == 0) {
+        free(result->elems);
+        result->elems = NULL;
+    }
+
+    return result;
 }
 
 // return a pointer to the subscription with the specified id
