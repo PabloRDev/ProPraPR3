@@ -246,11 +246,19 @@ int calculate_vipLevel(tSubscriptions *data, char *document) {
 
     for (int i = 0; i < data->count; i++) {
         if (strcmp(data->elems[i].document, document) == 0) {
-            totalPrice += data->elems[i].price;
+            const tDate start = data->elems[i].start_date;
+            const tDate end = data->elems[i].end_date;
+            // Calculate months
+            int months = (end.year - start.year) * 12 + (end.month - start.month);
+            if (end.day >= start.day) {
+                months += 1;
+            }
+
+            totalPrice += data->elems[i].price * (float) months;
         }
     }
 
-    return (int) (totalPrice * 12 / 500.0);
+    return (int) (totalPrice / 500.0);
 }
 
 // Update the vipLevel of each person 
