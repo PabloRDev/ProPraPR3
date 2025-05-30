@@ -69,12 +69,16 @@ tApiError people_free(tPeople *data);
 // AUX FUNCTIONS
 void swap(tPerson *a, tPerson *b);
 
+// Compare prototype
+typedef int (*CompareFunc)(const tPerson *, const tPerson *);
+
 int comparePersonsByVIPThenDocument(const tPerson *a, const tPerson *b);
 
-int QSPartition(tPerson arr[], int low, int high);
+int comparePersonsByDocument(const tPerson *a, const tPerson *b);
 
-void quickSort(tPerson arr[], int low, int high);
+int partition(tPerson arr[], int low, int high, CompareFunc cmp);
 
+void quickSort(tPerson arr[], int low, int high, CompareFunc cmp);
 
 ////////////////////////////////////////////
 

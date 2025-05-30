@@ -281,7 +281,7 @@ tApiError people_sortByVipLevel_QickSort(tPeople *data) {
     assert(data != NULL);
     if (data->count < 1) return E_SUCCESS;
 
-    quickSort(data->elems, 0, data->count - 1);
+    quickSort(data->elems, 0, data->count - 1, comparePersonsByVIPThenDocument);
 
     return E_SUCCESS;
 }
@@ -318,25 +318,28 @@ int comparePersonsByVIPThenDocument(const tPerson *a, const tPerson *b) {
     return strcmp(a->document, b->document);
 }
 
-int QSPartition(tPerson arr[], int low, int high) {
+int comparePersonsByDocument(const tPerson *a, const tPerson *b) {
+    return strcmp(a->document, b->document);
+}
+
+int partition(tPerson arr[], int low, int high, CompareFunc cmp) {
     tPerson pivot = arr[high];
     int i = low - 1;
 
     for (int j = low; j < high; j++) {
-        if (comparePersonsByVIPThenDocument(&arr[j], &pivot) < 0) {
+        if (cmp(&arr[j], &pivot) < 0) {
             i++;
             swap(&arr[i], &arr[j]);
         }
     }
-
     swap(&arr[i + 1], &arr[high]);
     return i + 1;
 }
 
-void quickSort(tPerson arr[], int low, int high) {
+void quickSort(tPerson arr[], int low, int high, CompareFunc cmp) {
     if (low < high) {
-        int pi = QSPartition(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+        int pi = partition(arr, low, high, cmp);
+        quickSort(arr, low, pi - 1, cmp);
+        quickSort(arr, pi + 1, high, cmp);
     }
 }
