@@ -296,13 +296,20 @@ tApiError people_sortByDocument_QickSort(tPeople *data) {
     return E_SUCCESS;
 }
 
-// Return the position of a person with provided document. -1 if it does not exist
+// 2g - Return the position of a person with provided document. -1 if it does not exist
 int people_findByEmail(tPeople data, const char *email) {
-    /////////////////////////////////
-    // PR3_2g
-    /////////////////////////////////
+    if (data.count < 1) return -1;
 
-    return -1;
+    int foundIndex = -1;
+
+    for (int i = 0; i < data.count; i++) {
+        if (strcmp(data.elems[i].email, email) == 0) {
+            if (foundIndex == -1) foundIndex = i;
+            else return -1;
+        }
+    }
+
+    return foundIndex;
 }
 
 // AUX FUNCTIONS
