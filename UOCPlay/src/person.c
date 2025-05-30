@@ -276,16 +276,17 @@ tApiError people_free(tPeople *data) {
     return E_SUCCESS;
 }
 
-// Sort people by VIP level from higher to lower
+// 2e - Sort people by VIP level from higher to lower
 tApiError people_sortByVipLevel_QickSort(tPeople *data) {
-    /////////////////////////////////
-    // PR3_2e
-    /////////////////////////////////
+    assert(data != NULL);
+    if (data->count < 1) return E_SUCCESS;
 
-    return E_NOT_IMPLEMENTED;
+    quickSort(data->elems, 0, data->count - 1);
+
+    return E_SUCCESS;
 }
 
-// Sort people by Document from lower to higher
+// 2f - Sort people by Document from lower to higher
 tApiError people_sortByDocument_QickSort(tPeople *data) {
     /////////////////////////////////
     // PR3_2f
@@ -301,4 +302,41 @@ int people_findByEmail(tPeople data, const char *email) {
     /////////////////////////////////
 
     return -1;
+}
+
+// AUX FUNCTIONS
+void swap(tPerson *a, tPerson *b) {
+    tPerson temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int comparePersonsByVIPThenDocument(const tPerson *a, const tPerson *b) {
+    if (a->vipLevel > b->vipLevel) return -1;
+    if (a->vipLevel < b->vipLevel) return 1;
+
+    return strcmp(a->document, b->document);
+}
+
+int QSPartition(tPerson arr[], int low, int high) {
+    tPerson pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (comparePersonsByVIPThenDocument(&arr[j], &pivot) < 0) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+
+    swap(&arr[i + 1], &arr[high]);
+    return i + 1;
+}
+
+void quickSort(tPerson arr[], int low, int high) {
+    if (low < high) {
+        int pi = QSPartition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
 }

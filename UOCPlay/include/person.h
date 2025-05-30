@@ -7,19 +7,19 @@
 #define NUM_FIELDS_PERSON 8
 
 typedef struct _tPerson {
-    char* document;
-    char* name;
-    char* surname;
-    char* phone;
-    char* email;
-    char* address;
-    char* cp;
+    char *document;
+    char *name;
+    char *surname;
+    char *phone;
+    char *email;
+    char *address;
+    char *cp;
     tDate birthday;
     int vipLevel;
 } tPerson;
 
 typedef struct _tPeople {
-    tPerson* elems;
+    tPerson *elems;
     int count;
 } tPeople;
 
@@ -28,43 +28,52 @@ typedef struct _tPeople {
 //////////////////////////////////
 
 // Parse input from CSVEntry
-void person_parse(tPerson* data, tCSVEntry entry);
+void person_parse(tPerson *data, tCSVEntry entry);
 
 // Copy the data from the source to destination
-void person_cpy(tPerson* destination, tPerson source);
+void person_cpy(tPerson *destination, tPerson source);
 
 // Remove the data from a person
-void person_free(tPerson* data);
+void person_free(tPerson *data);
 
 // Initialize the people data
-tApiError people_init(tPeople* data);
+tApiError people_init(tPeople *data);
 
 // Return the number of people
 int people_count(tPeople data);
 
 // Add a new person
-tApiError people_add(tPeople* data, tPerson person);
+tApiError people_add(tPeople *data, tPerson person);
 
 // Remove a person
-tApiError people_del(tPeople* data, const char *document);
+tApiError people_del(tPeople *data, const char *document);
 
 // Return the position of a person with provided document. -1 if it does not exist
-int people_find(tPeople data, const char* document);
+int people_find(tPeople data, const char *document);
 
 // Return the position of a person with provided email. -1 if it does not exist
-int people_findByEmail(tPeople data, const char* email);
+int people_findByEmail(tPeople data, const char *email);
 
 // Sort people by VIP level from higher to lower
-tApiError people_sortByVipLevel_QickSort(tPeople* data);
+tApiError people_sortByVipLevel_QickSort(tPeople *data);
 
 // Sort people by Document from lower to higher
-tApiError people_sortByDocument_QickSort(tPeople* data);
+tApiError people_sortByDocument_QickSort(tPeople *data);
 
 // Print the person data
 void people_print(tPeople data);
 
 // Remove the data from all persons
-tApiError people_free(tPeople* data);
+tApiError people_free(tPeople *data);
+
+// AUX FUNCTIONS
+void swap(tPerson *a, tPerson *b);
+
+int comparePersonsByVIPThenDocument(const tPerson *a, const tPerson *b);
+
+int QSPartition(tPerson arr[], int low, int high);
+
+void quickSort(tPerson arr[], int low, int high);
 
 
 ////////////////////////////////////////////
